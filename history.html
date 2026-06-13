@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}CipherPixel — Operation History{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <div class="page-badge history-badge">📜 HISTORY</div>
+        <h1 class="page-title">Operation <span class="text-cyan">History</span></h1>
+        <p class="page-desc">All encryption and decryption operations performed in this session.</p>
+    </div>
+</div>
+<div class="history-container">
+    <!-- Stats Bar -->
+    <div class="history-stats">
+        <div class="hstat">
+            <span class="hstat-num">{{ history | length }}</span>
+            <span class="hstat-label">Total Operations</span>
+        </div>
+        <div class="hstat">
+            <span class="hstat-num">{{ history | selectattr('operation', 'equalto', 'encrypt') | list | length }}</span>
+            <span class="hstat-label">Encrypted</span>
+        </div>
+        <div class="hstat">
+            <span class="hstat-num">{{ history | selectattr('operation', 'equalto', 'decrypt') | list | length }}</span>
+            <span class="hstat-label">Decrypted</span>
+        </div>
+        <div class="hstat-action">
+            <button class="btn btn-danger-outline" onclick="clearHistory()">🗑 Clear History</button>
+        </div>
+    </div>
+    {% if history %}
+    <div class="history-table-wrapper">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Operation</th>
+                    <th>Filename</th>
+                    <th>Algorithm</th>
+                    <th>Key</th>
+                    <th>Dimensions</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                <tr class="history-row">
+                    <td class="td-time">{{ item.timestamp }}</td>
+                    <td>
+                        <span class="op-badge {% if item.operation == 'encrypt' %}op-encrypt{% else %}op-decrypt{% endif %}">
+                            {% if item.operation == 'encrypt' %}🔒 Encrypt{% else %}🔓 Decrypt{% endif %}
+                        </span>
+                    </td>
+                    <td class="td-file" title="{{ item.filename }}">{{ item.filename[:20] }}{% if item.filename|length > 20 %}…{% endif %}</td>
+                    <td>
+                        <span class="algo-badge algo-{{ item.method }}">
+                            {% if item.method == 'xor' %}⊕ XOR
+                            {% elif item.method == 'pixel_swap' %}⇄ Pixel Swap
+                            {% elif item.method == 'math_op' %}∑ Math Op
+                            {% elif item.method == 'channel_shift' %}RGB Channel
+                            {% elif item.method == 'arnold_cat' %}∞ Arnold Cat
+                            {% else %}{{ item.method }}{% endif %}
+                        </span>
+                    </td>
+                    <td><code class="key-code">{{ item.key }}</code></td>
+                    <td class="td-dim">{{ item.width }} × {{ item.height }}</td>
+                    <td>
+                        <a href="/api/download/{{ item.output_file }}" class="btn-download" title="Download">📥</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-history">
+        <div class="empty-icon">📭</div>
+        <h3>No History Yet</h3>
+        <p>Your encryption and decryption operations will appear here.</p>
+        <a href="/encrypt" class="btn btn-primary">🔒 Start Encrypting</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function clearHistory() {
+    if (!confirm('Clear all history? This cannot be undone.')) return;
+    const res = await fetch('/api/history/clear', { method: 'POST' });
+    if ((await res.json()).success) location.reload();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CipherPixel — Image Encryption Tool{% endblock %}</title>
+    <meta name="description" content="Advanced image encryption tool using pixel manipulation techniques — XOR, Pixel Swap, Math Operations, Channel Shift & Arnold Cat Map.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-grid"></div>
+    <div class="scanline"></div>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <span class="brand-icon">⬡</span>
+                <span class="brand-text">CipherPixel</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <span class="nav-icon">⌂</span> Home
+                </a></li>
+                <li><a href="/encrypt" class="nav-link {% if request.path == '/encrypt' %}active{% endif %}">
+                    <span class="nav-icon">🔒</span> Encrypt
+                </a></li>
+                <li><a href="/decrypt" class="nav-link {% if request.path == '/decrypt' %}active{% endif %}">
+                    <span class="nav-icon">🔓</span> Decrypt
+                </a></li>
+                <li><a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}">
+                    <span class="nav-icon">📜</span> History
+                </a></li>
+                <li><a href="/about" class="nav-link {% if request.path == '/about' %}active{% endif %}">
+                    <span class="nav-icon">⬡</span> About
+                </a></li>
+            </ul>
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        </div>
+    </nav>
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="/" class="mobile-link">⌂ Home</a>
+        <a href="/encrypt" class="mobile-link">🔒 Encrypt</a>
+        <a href="/decrypt" class="mobile-link">🔓 Decrypt</a>
+        <a href="/history" class="mobile-link">📜 History</a>
+        <a href="/about" class="mobile-link">⬡ About</a>
+    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <span class="brand-icon">⬡</span>
+                <span>CipherPixel</span>
+            </div>
+            <p class="footer-text">Advanced Image Encryption using Pixel Manipulation Algorithms</p>
+            <div class="footer-links">
+                <a href="/" class="footer-link">Home</a>
+                <a href="/encrypt" class="footer-link">Encrypt</a>
+                <a href="/decrypt" class="footer-link">Decrypt</a>
+                <a href="/about" class="footer-link">About</a>
+            </div>
+            <p class="footer-copy">© 2025 CipherPixel · Built with Python Flask + NumPy + Pillow</p>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

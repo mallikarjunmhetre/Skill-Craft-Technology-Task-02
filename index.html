@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}CipherPixel — Secure Image Encryption{% endblock %}
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>Cybersecurity · Pixel Manipulation · Cryptography</span>
+        </div>
+        <h1 class="hero-title">
+            <span class="glitch" data-text="CIPHER">CIPHER</span>
+            <span class="hero-title-pixel">PIXEL</span>
+        </h1>
+        <p class="hero-subtitle">Advanced Image Encryption using Pixel-Level Manipulation Algorithms</p>
+        <p class="hero-desc">Transform your images into secure, unreadable data using military-grade pixel encryption. Supports 5 unique algorithms including XOR, Pixel Swap, Mathematical Operations, Channel Shift & Arnold Cat Map.</p>
+        <div class="hero-actions">
+            <a href="/encrypt" class="btn btn-primary">
+                <span>🔒</span> Start Encrypting
+            </a>
+            <a href="/about" class="btn btn-outline">
+                <span>⬡</span> Learn More
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-num">5</span>
+                <span class="stat-label">Algorithms</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-num">256-bit</span>
+                <span class="stat-label">Key Space</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">Reversible</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="pixel-grid" id="pixelGrid"></div>
+        <div class="hex-ring ring-1"></div>
+        <div class="hex-ring ring-2"></div>
+        <div class="hex-ring ring-3"></div>
+    </div>
+</section>
+<!-- Features Section -->
+<section class="section features-section">
+    <div class="section-header">
+        <h2 class="section-title">Encryption <span class="text-cyan">Algorithms</span></h2>
+        <p class="section-subtitle">Choose from 5 powerful pixel manipulation techniques</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card" data-delay="0">
+            <div class="feature-icon xor-icon">⊕</div>
+            <h3>XOR Cipher</h3>
+            <p>Each pixel value is XORed with a secret key. Fast, simple, and perfectly reversible — the same operation encrypts and decrypts.</p>
+            <div class="feature-tags">
+                <span class="tag">Symmetric</span>
+                <span class="tag">Lossless</span>
+                <span class="tag">O(n)</span>
+            </div>
+        </div>
+        <div class="feature-card" data-delay="1">
+            <div class="feature-icon swap-icon">⇄</div>
+            <h3>Pixel Swap</h3>
+            <p>Pixels are shuffled into random positions using a seeded pseudorandom permutation based on your key. Looks completely scrambled.</p>
+            <div class="feature-tags">
+                <span class="tag">Position-based</span>
+                <span class="tag">Key-seeded</span>
+                <span class="tag">Fisher-Yates</span>
+            </div>
+        </div>
+        <div class="feature-card" data-delay="2">
+            <div class="feature-icon math-icon">∑</div>
+            <h3>Math Operations</h3>
+            <p>Apply arithmetic operations (Add, Subtract, Multiply, Bitwise AND/OR) to every pixel value with modular arithmetic for wrapping.</p>
+            <div class="feature-tags">
+                <span class="tag">Modular</span>
+                <span class="tag">Multi-op</span>
+                <span class="tag">Custom</span>
+            </div>
+        </div>
+        <div class="feature-card" data-delay="3">
+            <div class="feature-icon channel-icon">RGB</div>
+            <h3>Channel Shift</h3>
+            <p>RGB color channels are rotated and their values are shifted independently, creating a visually distorted color-space transformation.</p>
+            <div class="feature-tags">
+                <span class="tag">RGB Rotation</span>
+                <span class="tag">Value Shift</span>
+                <span class="tag">Color-based</span>
+            </div>
+        </div>
+        <div class="feature-card" data-delay="4">
+            <div class="feature-icon arnold-icon">∞</div>
+            <h3>Arnold Cat Map</h3>
+            <p>A chaotic map from ergodic theory. Iteratively scrambles pixel positions using a nonlinear matrix transformation — highly secure.</p>
+            <div class="feature-tags">
+                <span class="tag">Chaotic</span>
+                <span class="tag">Iterative</span>
+                <span class="tag">Non-linear</span>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- How It Works -->
+<section class="section how-section">
+    <div class="section-header">
+        <h2 class="section-title">How It <span class="text-cyan">Works</span></h2>
+        <p class="section-subtitle">Simple 3-step process to secure your images</p>
+    </div>
+    <div class="steps-container">
+        <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-icon">📤</div>
+            <h3>Upload Image</h3>
+            <p>Select any PNG, JPG, JPEG or BMP image from your device. Your file never leaves your local server.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-icon">🔑</div>
+            <h3>Choose Key & Method</h3>
+            <p>Pick an encryption algorithm and set a numeric key (0-255). Remember your key — you'll need it to decrypt!</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-icon">📥</div>
+            <h3>Download Result</h3>
+            <p>Instantly get your encrypted image as a PNG. Fully reversible — use the same key and method to decrypt.</p>
+        </div>
+    </div>
+</section>
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Encrypt Your Images?</h2>
+        <p>Start securing your visual data with pixel-level cryptography today.</p>
+        <div class="cta-actions">
+            <a href="/encrypt" class="btn btn-primary btn-large">🔒 Encrypt Now</a>
+            <a href="/decrypt" class="btn btn-ghost btn-large">🔓 Decrypt Image</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+// Animated pixel grid
+const grid = document.getElementById('pixelGrid');
+const colors = ['#00f5ff', '#bf00ff', '#ff0080', '#00ff88', '#ffaa00'];
+for (let i = 0; i < 64; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'pixel-cell';
+    cell.style.animationDelay = `${Math.random() * 3}s`;
+    cell.style.animationDuration = `${1.5 + Math.random() * 2}s`;
+    if (Math.random() > 0.6) {
+        cell.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        cell.style.boxShadow = `0 0 8px ${colors[Math.floor(Math.random() * colors.length)]}`;
+    }
+    grid.appendChild(cell);
+}
+// Feature cards entrance animation
+const cards = document.querySelectorAll('.feature-card');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const delay = entry.target.dataset.delay || 0;
+            setTimeout(() => entry.target.classList.add('visible'), delay * 120);
+        }
+    });
+}, { threshold: 0.1 });
+cards.forEach(card => observer.observe(card));
+</script>
+{% endblock %}

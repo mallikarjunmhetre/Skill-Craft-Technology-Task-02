@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}CipherPixel — About & Security{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <div class="page-badge about-badge">⬡ ABOUT</div>
+        <h1 class="page-title">Security & <span class="text-cyan">Technology</span></h1>
+        <p class="page-desc">Learn about the pixel manipulation algorithms, cryptographic concepts, and technology stack behind CipherPixel.</p>
+    </div>
+</div>
+<div class="about-container">
+    <!-- Algorithm Deep Dives -->
+    <section class="about-section">
+        <h2 class="about-section-title">🔬 Algorithm Details</h2>
+        <div class="algo-cards">
+            <div class="algo-detail-card">
+                <div class="algo-detail-header">
+                    <div class="algo-detail-icon xor-icon">⊕</div>
+                    <div>
+                        <h3>XOR Cipher</h3>
+                        <span class="complexity-badge">O(n) · Symmetric</span>
+                    </div>
+                </div>
+                <p>Each pixel's RGB channels are XORed with the key value. XOR is a bitwise operation: if both bits are same → 0, else → 1. Because XOR is its own inverse (A⊕K⊕K = A), the same operation both encrypts and decrypts.</p>
+                <div class="formula-box">
+                    <code>Encrypted[i] = Pixel[i] XOR Key</code><br>
+                    <code>Decrypted[i] = Encrypted[i] XOR Key</code>
+                </div>
+                <div class="algo-props">
+                    <div class="prop"><span class="prop-icon">✅</span>Fast &amp; simple</div>
+                    <div class="prop"><span class="prop-icon">✅</span>Perfect reversibility</div>
+                    <div class="prop"><span class="prop-icon">⚠️</span>Weak against known-plaintext attack</div>
+                </div>
+            </div>
+            <div class="algo-detail-card">
+                <div class="algo-detail-header">
+                    <div class="algo-detail-icon swap-icon">⇄</div>
+                    <div>
+                        <h3>Pixel Swap (Fisher-Yates Shuffle)</h3>
+                        <span class="complexity-badge">O(n) · Position-based</span>
+                    </div>
+                </div>
+                <p>All pixels are treated as a flat list and shuffled using the Fisher-Yates algorithm with a key-seeded random number generator (Python's <code>random.Random(key)</code>). The pixel values remain unchanged but their positions are scrambled.</p>
+                <div class="formula-box">
+                    <code>indices = Fisher-Yates shuffle(seed=key)</code><br>
+                    <code>encrypted[indices[i]] = original[i]</code>
+                </div>
+                <div class="algo-props">
+                    <div class="prop"><span class="prop-icon">✅</span>Preserves pixel values</div>
+                    <div class="prop"><span class="prop-icon">✅</span>Visually unrecognizable</div>
+                    <div class="prop"><span class="prop-icon">⚠️</span>Histogram unchanged</div>
+                </div>
+            </div>
+            <div class="algo-detail-card">
+                <div class="algo-detail-header">
+                    <div class="algo-detail-icon math-icon">∑</div>
+                    <div>
+                        <h3>Mathematical Operations</h3>
+                        <span class="complexity-badge">O(n) · Modular Arithmetic</span>
+                    </div>
+                </div>
+                <p>Arithmetic operations (add, subtract, multiply) or bitwise operations (AND, OR) are applied to every pixel channel with modular wraparound at 256. The inverse operation recovers the original values.</p>
+                <div class="formula-box">
+                    <code>Add:      E[i] = (P[i] + K) mod 256</code><br>
+                    <code>Subtract: E[i] = (P[i] - K) mod 256</code><br>
+                    <code>Multiply: E[i] = (P[i] × K) mod 256</code>
+                </div>
+                <div class="algo-props">
+                    <div class="prop"><span class="prop-icon">✅</span>Multiple operation types</div>
+                    <div class="prop"><span class="prop-icon">✅</span>Value-based transformation</div>
+                    <div class="prop"><span class="prop-icon">⚠️</span>Multiply requires odd key</div>
+                </div>
+            </div>
+            <div class="algo-detail-card">
+                <div class="algo-detail-header">
+                    <div class="algo-detail-icon channel-icon" style="font-size:1rem;font-weight:800;">RGB</div>
+                    <div>
+                        <h3>Channel Shift</h3>
+                        <span class="complexity-badge">O(n) · Color-space</span>
+                    </div>
+                </div>
+                <p>RGB channels are rotated (e.g., R→G, G→B, B→R) and their values are independently shifted by key multiples. This combines positional channel scrambling with value modification, producing visually dramatic results.</p>
+                <div class="formula-box">
+                    <code>R_enc = (G + key) mod 256</code><br>
+                    <code>G_enc = (B + key×2) mod 256</code><br>
+                    <code>B_enc = (R + key×3) mod 256</code>
+                </div>
+                <div class="algo-props">
+                    <div class="prop"><span class="prop-icon">✅</span>Dramatic visual effect</div>
+                    <div class="prop"><span class="prop-icon">✅</span>Dual transformation</div>
+                    <div class="prop"><span class="prop-icon">⚠️</span>Color histogram visible</div>
+                </div>
+            </div>
+            <div class="algo-detail-card full-width">
+                <div class="algo-detail-header">
+                    <div class="algo-detail-icon arnold-icon">∞</div>
+                    <div>
+                        <h3>Arnold's Cat Map</h3>
+                        <span class="complexity-badge">O(n²) · Chaotic Dynamical System</span>
+                    </div>
+                </div>
+                <p>Introduced by Vladimir Arnold in the 1960s, the Cat Map is a chaotic area-preserving map on a torus. Each pixel at (x, y) is mapped to a new position using the matrix transformation below, applied over multiple iterations. It's periodic — after enough iterations the image returns to its original state, making decryption possible by applying the inverse transform.</p>
+                <div class="formula-box wide">
+                    <code>[ x' ]   [ 1  1 ] [ x ]   (mod N)</code><br>
+                    <code>[ y' ] = [ 1  2 ] [ y ]</code><br><br>
+                    <code>Inverse:  x = 2x' - y' (mod N)</code><br>
+                    <code>          y = -x' + y' (mod N)</code>
+                </div>
+                <div class="algo-props">
+                    <div class="prop"><span class="prop-icon">✅</span>Highly chaotic scrambling</div>
+                    <div class="prop"><span class="prop-icon">✅</span>Based on ergodic theory</div>
+                    <div class="prop"><span class="prop-icon">✅</span>Used in academic research</div>
+                    <div class="prop"><span class="prop-icon">⚠️</span>Periodic (finite period)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Security Concepts -->
+    <section class="about-section">
+        <h2 class="about-section-title">🛡️ Cybersecurity Concepts</h2>
+        <div class="security-grid">
+            <div class="security-card">
+                <div class="sec-icon">🔐</div>
+                <h4>Symmetric Encryption</h4>
+                <p>The same key is used for both encryption and decryption. Our algorithms follow symmetric key cryptography, like AES in concept.</p>
+            </div>
+            <div class="security-card">
+                <div class="sec-icon">🌀</div>
+                <h4>Confusion & Diffusion</h4>
+                <p>Shannon's principles: Confusion (obscure key-ciphertext relationship) via XOR; Diffusion (spread plaintext statistics) via pixel swapping.</p>
+            </div>
+            <div class="security-card">
+                <div class="sec-icon">📊</div>
+                <h4>Histogram Analysis</h4>
+                <p>A strong encryption should flatten the image histogram. Pixel swap preserves histogram; XOR and math ops change it significantly.</p>
+            </div>
+            <div class="security-card">
+                <div class="sec-icon">🔢</div>
+                <h4>Key Space</h4>
+                <p>With 256 possible keys, brute force is feasible. In production systems, keys would use 128-bit or 256-bit spaces (AES standard).</p>
+            </div>
+            <div class="security-card">
+                <div class="sec-icon">🎲</div>
+                <h4>Pseudorandomness</h4>
+                <p>Pixel swap uses Python's Mersenne Twister PRNG seeded with your key — deterministic but statistically random output.</p>
+            </div>
+            <div class="security-card">
+                <div class="sec-icon">∞</div>
+                <h4>Chaos Theory</h4>
+                <p>Arnold's Cat Map demonstrates how deterministic chaotic systems create apparent randomness, a foundation of modern cryptography research.</p>
+            </div>
+        </div>
+    </section>
+    <!-- Tech Stack -->
+    <section class="about-section">
+        <h2 class="about-section-title">⚙️ Technology Stack</h2>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-logo py-logo">Py</div>
+                <h4>Python 3.x</h4>
+                <p>Core backend logic, all encryption algorithms</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo flask-logo">Fl</div>
+                <h4>Flask</h4>
+                <p>Lightweight web framework, REST API server</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo np-logo">Np</div>
+                <h4>NumPy</h4>
+                <p>Vectorized pixel operations — fast array math</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo pil-logo">PIL</div>
+                <h4>Pillow (PIL)</h4>
+                <p>Image I/O — open, convert, save images</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo html-logo">HTML</div>
+                <h4>HTML5</h4>
+                <p>Semantic markup, file upload, canvas-ready</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo css-logo">CSS</div>
+                <h4>CSS3</h4>
+                <p>Animations, glassmorphism, cyberpunk design</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo js-logo">JS</div>
+                <h4>JavaScript</h4>
+                <p>Async fetch API, drag-drop, real-time updates</p>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo sec-logo">🔒</div>
+                <h4>Cryptography</h4>
+                <p>XOR, permutation ciphers, chaotic maps</p>
+            </div>
+        </div>
+    </section>
+    <!-- Limitations / Disclaimer -->
+    <section class="about-section">
+        <div class="disclaimer-box">
+            <h3>⚠️ Educational Purpose Disclaimer</h3>
+            <p>CipherPixel is built for <strong>educational and demonstration purposes</strong>. The encryption algorithms implemented here are simplified illustrations of cryptographic concepts. For protecting sensitive data in production, use established standards like <strong>AES-256, RSA, or ChaCha20</strong> from audited cryptography libraries.</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

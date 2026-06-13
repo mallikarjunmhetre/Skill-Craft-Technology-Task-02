@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+{% block title %}CipherPixel — Encrypt Image{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <div class="page-badge encrypt-badge">🔒 ENCRYPT MODE</div>
+        <h1 class="page-title">Image <span class="text-cyan">Encryption</span></h1>
+        <p class="page-desc">Upload your image, choose an encryption algorithm and key, then download the encrypted result.</p>
+    </div>
+</div>
+<div class="tool-container">
+    <!-- Left Panel: Upload & Config -->
+    <div class="tool-panel config-panel">
+        <div class="panel-header">
+            <span class="panel-icon">⚙</span>
+            <span>Configuration</span>
+        </div>
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+            <input type="file" id="imageInput" accept="image/*" hidden>
+            <div class="upload-inner" id="uploadInner">
+                <div class="upload-icon">📤</div>
+                <p class="upload-title">Drop Image Here</p>
+                <p class="upload-sub">or click to browse</p>
+                <p class="upload-types">PNG · JPG · JPEG · BMP · GIF</p>
+            </div>
+            <div class="upload-preview hidden" id="uploadPreview">
+                <img id="previewImg" src="" alt="Preview">
+                <div class="preview-overlay">
+                    <button class="preview-remove" onclick="removeImage()">✕ Remove</button>
+                </div>
+            </div>
+        </div>
+        <!-- Image Info -->
+        <div class="image-info hidden" id="imageInfo">
+            <div class="info-row">
+                <span class="info-label">Filename</span>
+                <span class="info-value" id="infoFilename">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Size</span>
+                <span class="info-value" id="infoSize">—</span>
+            </div>
+        </div>
+        <!-- Algorithm Selection -->
+        <div class="config-group">
+            <label class="config-label">🔐 Encryption Algorithm</label>
+            <div class="algo-grid" id="algoGrid">
+                <button class="algo-btn active" data-algo="xor" onclick="selectAlgo('xor', this)">
+                    <span class="algo-sym">⊕</span>
+                    <span class="algo-name">XOR</span>
+                    <span class="algo-desc">Bitwise XOR</span>
+                </button>
+                <button class="algo-btn" data-algo="pixel_swap" onclick="selectAlgo('pixel_swap', this)">
+                    <span class="algo-sym">⇄</span>
+                    <span class="algo-name">Pixel Swap</span>
+                    <span class="algo-desc">Shuffle pixels</span>
+                </button>
+                <button class="algo-btn" data-algo="math_op" onclick="selectAlgo('math_op', this)">
+                    <span class="algo-sym">∑</span>
+                    <span class="algo-name">Math Op</span>
+                    <span class="algo-desc">Arithmetic</span>
+                </button>
+                <button class="algo-btn" data-algo="channel_shift" onclick="selectAlgo('channel_shift', this)">
+                    <span class="algo-sym" style="font-size:0.7rem;font-weight:700;">RGB</span>
+                    <span class="algo-name">Channel</span>
+                    <span class="algo-desc">Color shift</span>
+                </button>
+                <button class="algo-btn" data-algo="arnold_cat" onclick="selectAlgo('arnold_cat', this)">
+                    <span class="algo-sym">∞</span>
+                    <span class="algo-name">Arnold</span>
+                    <span class="algo-desc">Cat Map</span>
+                </button>
+            </div>
+        </div>
+        <!-- Key Input -->
+        <div class="config-group" id="keyGroup">
+            <label class="config-label" for="encKey">🔑 Encryption Key <span class="key-range">(0–255)</span></label>
+            <div class="key-input-group">
+                <input type="number" id="encKey" class="key-input" value="42" min="0" max="255" placeholder="Enter key...">
+                <button class="key-random" onclick="randomKey()" title="Random key">⚅</button>
+            </div>
+            <div class="key-strength-bar">
+                <div class="key-strength-fill" id="keyStrengthFill"></div>
+            </div>
+            <span class="key-strength-label" id="keyStrengthLabel">Medium strength</span>
+        </div>
+        <!-- Math Operation (shown only for math_op) -->
+        <div class="config-group hidden" id="mathOpGroup">
+            <label class="config-label">⚡ Operation Type</label>
+            <select class="config-select" id="mathOperation">
+                <option value="add">➕ Add (pixel + key)</option>
+                <option value="subtract">➖ Subtract (pixel - key)</option>
+                <option value="multiply">✖ Multiply (pixel × key)</option>
+                <option value="bitwise_and">& Bitwise AND</option>
+                <option value="bitwise_or">| Bitwise OR</option>
+            </select>
+        </div>
+        <!-- Arnold iterations (shown only for arnold_cat) -->
+        <div class="config-group hidden" id="arnoldGroup">
+            <label class="config-label">🔄 Iterations <span class="key-range">(1–20)</span></label>
+            <input type="range" id="arnoldIter" class="config-range" min="1" max="20" value="5">
+            <div class="range-display">Iterations: <span id="arnoldIterVal">5</span></div>
+        </div>
+        <!-- Encrypt Button -->
+        <button class="btn btn-primary btn-full" id="encryptBtn" onclick="encryptImage()">
+            <span id="encryptBtnText">🔒 Encrypt Image</span>
+            <span id="encryptSpinner" class="spinner hidden"></span>
+        </button>
+    </div>
+    <!-- Right Panel: Result -->
+    <div class="tool-panel result-panel">
+        <div class="panel-header">
+            <span class="panel-icon">📊</span>
+            <span>Result</span>
+        </div>
+        <!-- Result Placeholder -->
+        <div class="result-placeholder" id="resultPlaceholder">
+            <div class="placeholder-icon">🔐</div>
+            <p>Your encrypted image will appear here</p>
+            <p class="placeholder-sub">Upload an image and configure settings to begin</p>
+        </div>
+        <!-- Result Content -->
+        <div class="result-content hidden" id="resultContent">
+            <div class="result-images">
+                <div class="result-img-box">
+                    <span class="result-img-label">Original</span>
+                    <img id="origImg" src="" alt="Original">
+                </div>
+                <div class="result-arrow">⟶</div>
+                <div class="result-img-box">
+                    <span class="result-img-label">Encrypted</span>
+                    <img id="encImg" src="" alt="Encrypted">
+                </div>
+            </div>
+            <!-- Metadata -->
+            <div class="result-meta">
+                <div class="meta-card">
+                    <span class="meta-icon">📏</span>
+                    <div>
+                        <span class="meta-label">Dimensions</span>
+                        <span class="meta-value" id="metaDimensions">—</span>
+                    </div>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-icon">🎨</span>
+                    <div>
+                        <span class="meta-label">Color Mode</span>
+                        <span class="meta-value" id="metaMode">—</span>
+                    </div>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-icon">🔐</span>
+                    <div>
+                        <span class="meta-label">Algorithm</span>
+                        <span class="meta-value" id="metaAlgo">—</span>
+                    </div>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-icon">🔑</span>
+                    <div>
+                        <span class="meta-label">Key Used</span>
+                        <span class="meta-value" id="metaKey">—</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Key reminder -->
+            <div class="key-reminder" id="keyReminder">
+                <span>⚠️</span>
+                <div>
+                    <strong>Save Your Key!</strong>
+                    <p>Key: <code id="reminderKey">—</code> · Method: <code id="reminderMethod">—</code><br>
+                    You'll need the same key and method to decrypt this image.</p>
+                </div>
+            </div>
+            <!-- Download -->
+            <button class="btn btn-success btn-full" id="downloadBtn" onclick="downloadResult()">
+                📥 Download Encrypted Image
+            </button>
+        </div>
+        <!-- Error Display -->
+        <div class="error-box hidden" id="errorBox">
+            <span class="error-icon">⚠️</span>
+            <span id="errorMsg">An error occurred</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let selectedAlgo = 'xor';
+let uploadedFile = null;
+let resultUID = null;
+let originalPreviewURL = null;
+// ── Upload Zone ──
+const uploadZone = document.getElementById('uploadZone');
+const imageInput = document.getElementById('imageInput');
+uploadZone.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('preview-remove')) imageInput.click();
+});
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+});
+imageInput.addEventListener('change', () => {
+    if (imageInput.files[0]) handleFile(imageInput.files[0]);
+});
+function handleFile(file) {
+    uploadedFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        originalPreviewURL = e.target.result;
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('uploadInner').classList.add('hidden');
+        document.getElementById('uploadPreview').classList.remove('hidden');
+        document.getElementById('imageInfo').classList.remove('hidden');
+        document.getElementById('infoFilename').textContent = file.name;
+        document.getElementById('infoSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+    };
+    reader.readAsDataURL(file);
+}
+function removeImage() {
+    uploadedFile = null;
+    imageInput.value = '';
+    document.getElementById('uploadInner').classList.remove('hidden');
+    document.getElementById('uploadPreview').classList.add('hidden');
+    document.getElementById('imageInfo').classList.add('hidden');
+    document.getElementById('resultContent').classList.add('hidden');
+    document.getElementById('resultPlaceholder').classList.remove('hidden');
+}
+// ── Algorithm Selection ──
+function selectAlgo(algo, btn) {
+    selectedAlgo = algo;
+    document.querySelectorAll('.algo-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('mathOpGroup').classList.toggle('hidden', algo !== 'math_op');
+    document.getElementById('arnoldGroup').classList.toggle('hidden', algo !== 'arnold_cat');
+    document.getElementById('keyGroup').classList.toggle('hidden', algo === 'arnold_cat');
+}
+// ── Key Strength ──
+document.getElementById('encKey').addEventListener('input', updateKeyStrength);
+function updateKeyStrength() {
+    const key = parseInt(document.getElementById('encKey').value) || 0;
+    const strength = key === 0 ? 0 : key < 50 ? 25 : key < 128 ? 60 : key < 200 ? 85 : 100;
+    const fill = document.getElementById('keyStrengthFill');
+    const label = document.getElementById('keyStrengthLabel');
+    fill.style.width = strength + '%';
+    fill.style.background = strength < 40 ? '#ff4444' : strength < 70 ? '#ffaa00' : '#00ff88';
+    label.textContent = strength < 40 ? 'Weak key' : strength < 70 ? 'Medium strength' : 'Strong key';
+}
+function randomKey() {
+    const key = Math.floor(Math.random() * 254) + 1;
+    document.getElementById('encKey').value = key;
+    updateKeyStrength();
+}
+// Arnold range
+document.getElementById('arnoldIter').addEventListener('input', function() {
+    document.getElementById('arnoldIterVal').textContent = this.value;
+});
+// ── Encrypt ──
+async function encryptImage() {
+    if (!uploadedFile) {
+        showError('Please upload an image first.');
+        return;
+    }
+    const btn = document.getElementById('encryptBtn');
+    const btnText = document.getElementById('encryptBtnText');
+    const spinner = document.getElementById('encryptSpinner');
+    btn.disabled = true;
+    btnText.textContent = 'Encrypting...';
+    spinner.classList.remove('hidden');
+    hideError();
+    const formData = new FormData();
+    formData.append('image', uploadedFile);
+    formData.append('method', selectedAlgo);
+    formData.append('key', document.getElementById('encKey').value);
+    if (selectedAlgo === 'math_op') formData.append('operation', document.getElementById('mathOperation').value);
+    if (selectedAlgo === 'arnold_cat') formData.append('iterations', document.getElementById('arnoldIter').value);
+    try {
+        const res = await fetch('/api/encrypt', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+            resultUID = data.uid;
+            const algoNames = { xor: 'XOR Cipher', pixel_swap: 'Pixel Swap', math_op: 'Math Operation', channel_shift: 'Channel Shift', arnold_cat: 'Arnold Cat Map' };
+            document.getElementById('origImg').src = originalPreviewURL;
+            document.getElementById('encImg').src = `/api/preview/${data.output_file}`;
+            document.getElementById('metaDimensions').textContent = `${data.metadata.width} × ${data.metadata.height}`;
+            document.getElementById('metaMode').textContent = data.metadata.mode;
+            document.getElementById('metaAlgo').textContent = algoNames[data.method] || data.method;
+            document.getElementById('metaKey').textContent = data.key;
+            document.getElementById('reminderKey').textContent = data.key;
+            document.getElementById('reminderMethod').textContent = algoNames[data.method] || data.method;
+            document.getElementById('resultPlaceholder').classList.add('hidden');
+            document.getElementById('resultContent').classList.remove('hidden');
+        } else {
+            showError(data.error || 'Encryption failed');
+        }
+    } catch (e) {
+        showError('Network error: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btnText.textContent = '🔒 Encrypt Image';
+        spinner.classList.add('hidden');
+    }
+}
+function downloadResult() {
+    if (resultUID) window.open(`/api/download/${resultUID}_encrypted.png`);
+}
+function showError(msg) {
+    document.getElementById('errorMsg').textContent = msg;
+    document.getElementById('errorBox').classList.remove('hidden');
+    document.getElementById('resultPlaceholder').classList.add('hidden');
+}
+function hideError() {
+    document.getElementById('errorBox').classList.add('hidden');
+    document.getElementById('resultPlaceholder').classList.remove('hidden');
+}
+updateKeyStrength();
+</script>
+{% endblock %}
